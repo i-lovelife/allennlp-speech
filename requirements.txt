@@ -1,2 +1,5 @@
 allennlp==0.6.1
 jupyter
+mypy
+pylint
+scipy
