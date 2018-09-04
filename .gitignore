@@ -5,3 +5,5 @@ __pycache__/
 # Jupyter Notebook
 .ipynb_checkpoints
 *.py[co]
+.mypy_cache/
+allennlp_speech.egg-info/
