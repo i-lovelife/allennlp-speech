@@ -1,46 +1,20 @@
 # pylint: disable=no-self-use,invalid-name
 import pytest
 
-from src.dataset_readers.speech_commands_v1 import SpeechCommandsV1
-from src import 
-
-from allennlp.common import Params
 from allennlp.common.util import ensure_list
+
+from src.dataset_readers.speech_commands_v1 import SpeechCommandsV1
+from src import TEST_FIXTURES_ROOT, DATA_ROOT
+
 
 class TestSpeechCommandsV1:
     @pytest.mark.parametrize("lazy", (True, False))
     def test_read_from_file(self, lazy):
-        reader = SpeechCommandsV1(lazy=lazy)
-        instances = ensure_list(reader.read(AllenNlpTestCase.FIXTURES_ROOT / 'data' / 'squad.json'))
+        reader = SpeechCommandsV1(data_root=DATA_ROOT / 'speech_commands_v1', lazy=lazy)
+        instances = ensure_list(reader.read(TEST_FIXTURES_ROOT / 'speech_commands_v1' / 'train.txt'))
         assert len(instances) == 5
 
-        assert [t.text for t in instances[0].fields["question"].tokens[:3]] == ["To", "whom", "did"]
-        assert [t.text for t in instances[0].fields["passage"].tokens[:3]] == ["Architecturally", ",", "the"]
-        assert [t.text for t in instances[0].fields["passage"].tokens[-3:]] == ["of", "Mary", "."]
-        assert instances[0].fields["span_start"].sequence_index == 102
-        assert instances[0].fields["span_end"].sequence_index == 104
+        assert [instance.fields['label'].label for instance in instances] == ['nine', 'nine', 'down', 'nine', 'left']
 
-        assert [t.text for t in instances[1].fields["question"].tokens[:3]] == ["What", "sits", "on"]
-        assert [t.text for t in instances[1].fields["passage"].tokens[:3]] == ["Architecturally", ",", "the"]
-        assert [t.text for t in instances[1].fields["passage"].tokens[-3:]] == ["of", "Mary", "."]
-        assert instances[1].fields["span_start"].sequence_index == 17
-        assert instances[1].fields["span_end"].sequence_index == 23
-
-        # We're checking this case because I changed the answer text to only have a partial
-        # annotation for the last token, which happens occasionally in the training data.  We're
-        # making sure we get a reasonable output in that case here.
-        assert ([t.text for t in instances[3].fields["question"].tokens[:3]] ==
-                ["Which", "individual", "worked"])
-        assert [t.text for t in instances[3].fields["passage"].tokens[:3]] == ["In", "1882", ","]
-        assert [t.text for t in instances[3].fields["passage"].tokens[-3:]] == ["Nuclear", "Astrophysics", "."]
-        span_start = instances[3].fields["span_start"].sequence_index
-        span_end = instances[3].fields["span_end"].sequence_index
-        answer_tokens = instances[3].fields["passage"].tokens[span_start:(span_end + 1)]
-        expected_answer_tokens = ["Father", "Julius", "Nieuwland"]
-        assert [t.text for t in answer_tokens] == expected_answer_tokens
-
-    def test_can_build_from_params(self):
-        reader = SpeechCommandsV1.from_params(Params({}))
-        # pylint: disable=protected-access
-        assert reader._tokenizer.__class__.__name__ == 'WordTokenizer'
-        assert reader._token_indexers["tokens"].__class__.__name__ == 'SingleIdTokenIndexer'
+        for instance in instances:
+            assert instance.fields['features'].array.shape == (99, 161)

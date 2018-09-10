@@ -1,4 +1,5 @@
 from typing import Dict
+from pathlib import Path
 from allennlp.data import DatasetReader, Instance
 from allennlp.data.fields import LabelField, ArrayField, Field
 
@@ -12,8 +13,9 @@ class SpeechCommandsV1(DatasetReader):
     """
     A dataset reader for google speech commands dataset v0.01
     """
-    def __init__(self, lazy: bool = False) -> None:
+    def __init__(self, data_root: str, lazy: bool = False) -> None:
         super(SpeechCommandsV1, self).__init__(lazy)
+        self._data_root = Path(data_root)
 
     @overrides
     def _read(self, file_path):
@@ -21,11 +23,11 @@ class SpeechCommandsV1(DatasetReader):
             file_list = fh.readlines()
         file_list = [s.strip() for s in file_list]
         for file_name in file_list:
-            sample_rate, sample = wavfile.read(file_name)
+            sample_rate, sample = wavfile.read(self._data_root / file_name)
             feature = SpeechCommandsV1.transform(sample, sample_rate)
             fields: Dict[str, Field] = {}
-            lable = file_name.split('/')[0]
-            fields['lable'] = LabelField(lable)
+            label = file_name.split('/')[0]
+            fields['label'] = LabelField(label)
             fields['features'] = ArrayField(feature)
             yield Instance(fields)
     
