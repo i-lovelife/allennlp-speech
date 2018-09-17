@@ -16,7 +16,7 @@ import torch.nn.functional as F
 class AsrBaseline(Model):
     """
     """
-    def __init__(self, 
+    def __init__(self,
                  vocab: Vocabulary,
                  encoder: Seq2SeqEncoder,
                  classifier: Seq2VecEncoder,
