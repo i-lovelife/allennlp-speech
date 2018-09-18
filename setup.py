@@ -5,11 +5,12 @@ setup(name="allennlp-speech",
       packages=find_packages(exclude=["*.tests", "*.tests.*",
                                       "tests.*", "tests"]),
       install_requires=[
-          'allennlp==0.6.1',
-          'scipy==1.1.0',
-          'jupyter',
-          'jupyterlab',
-          'mypy'
-      ],
+              'allennlp==0.6.1',
+              'scipy==1.1.0',
+              'jupyter',
+              'jupyterlab',
+              'mypy',
+              'librosa==0.6.2'
+              ],
       python_requires='>=3.6.1'
-)
+     )
