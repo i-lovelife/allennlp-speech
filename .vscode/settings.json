@@ -26,6 +26,7 @@
         "--ignore-missing-imports",
         "--follow-imports=silent"
     ],
+    "python.formatting.provider": "autopep8",
     "python.linting.pylintArgs": ["-d locally-disabled,locally-enabled"],
     "python.jediEnabled": false,
 }
