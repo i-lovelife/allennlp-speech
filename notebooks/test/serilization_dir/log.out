@@ -1,0 +1,10 @@
+instantiating class <class 'allennlp.data.dataset_readers.dataset_reader.DatasetReader'> from params {'type': 'vctk', 'cache_path': PosixPath('/home/lnan6257/work/dataset/speech/VCTK-Corpus/data-small.hdf5'), 'feature_name': 'mag', 'audio_transformer': {'type': 'mag'}} and extras {}
+dataset_reader.type = vctk
+instantiating class <class 'src.dataset_readers.vctk.VCTK'> from params {'cache_path': PosixPath('/home/lnan6257/work/dataset/speech/VCTK-Corpus/data-small.hdf5'), 'feature_name': 'mag', 'audio_transformer': {'type': 'mag'}} and extras {}
+dataset_reader.cache_path = /home/lnan6257/work/dataset/speech/VCTK-Corpus/data-small.hdf5
+instantiating class <class 'src.data.audio_transformer.AudioTransformer'> from params {'type': 'mag'} and extras {}
+dataset_reader.feature_name = mag
+dataset_reader.force = False
+dataset_reader.lazy = False
+Reading training data from /home/lnan6257/work/dataset/speech/VCTK-Corpus/generated/dataset_list.train.small
+instantiating class <class 'allennlp.data.dataset_readers.dataset_reader.DatasetReader'> from params {} and extras {}

@@ -3,32 +3,36 @@ import re
 from pathlib import Path
 from typing import Dict, Iterable, Union, Tuple
 import glob
+from functools import reduce
 import numpy as np
 
 import h5py
-from allennlp.data import Instance
-from allennlp.data.fields import (ArrayField, Field, LabelField, MetadataField,
-                                  TextField)
+from allennlp.data import Instance, DatasetReader
 from allennlp.data.token_indexers import SingleIdTokenIndexer
 from allennlp.data.tokenizers import CharacterTokenizer
+from allennlp.data.fields import ArrayField, Field, LabelField, MetadataField, TextField
 from overrides import overrides
 
 from src.data.audio_transformer import AudioTransformer
+from src.data.mel_spectrogram import MelSpectrogram
 from src.dataset_readers.speech_dataset_reader import SpeechDatasetReader
 
-
+@DatasetReader.register('vctk')
 class VCTK(SpeechDatasetReader):
     def __init__(self,
-                 cache_path: str,
-                 audio_transformer: AudioTransformer,
+                 cache_path: Union[str, Path],
+                 audio_transformer: AudioTransformer = None,
                  feature_name: str = 'mag',
+                 force: bool = False,
                  lazy: bool = False) -> None:
         super(VCTK, self).__init__(lazy)
-        self.cache_path = cache_path
-        self.audio_transformer = audio_transformer
+        self.cache_path = Path(cache_path)
+        self.audio_transformer = audio_transformer or MelSpectrogram()
         self.feature_name = feature_name
-        self.tokenizer = CharacterTokenizer(lowercase_characters=True)
+        self.tokenizer = CharacterTokenizer()
         self.token_indexers = {'character': SingleIdTokenIndexer(namespace='character')}
+        if force and self.cache_path.exists():
+            self.cache_path.unlink()
 
     @overrides
     def audio_to_instance(self, *inputs):
@@ -43,7 +47,7 @@ class VCTK(SpeechDatasetReader):
         for example in dataset:
             fields: Dict[str, Field] = {}
             audio_file = example['audio_file']
-            meta_data = example['metadata']
+            meta_data = example['meta_data']
             sex_label = meta_data['sex']
             txt_label = meta_data['txt']
             speaker_id = meta_data['speaker_id']
@@ -53,13 +57,21 @@ class VCTK(SpeechDatasetReader):
             if location in cache_file:
                 feature = cache_file[location].value
             else:
-                feature = self.audio_transformer(audio_file)
+                feature = self.audio_transformer.transform(audio_file)
                 cache_file.create_dataset(location, data=feature, dtype=np.float32)
             fields['feature'] = ArrayField(feature)
-            filtered_txt = [c if re.match(r"[a-zA-Z']", c) else ' ' for c in txt_label]
+            fields['feature_length'] = LabelField(feature.shape[0], label_namespace='tags', skip_indexing=True)
+            filtered_txt = [c.lower() if re.match(r"[a-zA-Z']", c) else ' ' for c in txt_label]
+            filtered_txt = reduce(lambda x, y: x + y, filtered_txt)
             fields['txt_label'] = TextField(self.tokenizer.tokenize(filtered_txt), self.token_indexers)
             fields['sex_label'] = LabelField(sex_label, label_namespace='sex_labels', skip_indexing=True)
-            fields['meta_data'] = MetadataField(meta_data)
+            fields['txt_length'] = LabelField(len(filtered_txt), label_namespace='tags', skip_indexing=True)
+            fields['meta_data'] = MetadataField({'speaker_id': speaker_id,
+                                                 'chapter_id': chapter_id,
+                                                 'txt_label': filtered_txt,
+                                                 'sex_label': sex_label,
+                                                 'txt': txt_label,
+                                                 'audio_file': audio_file})
             yield Instance(fields)
         cache_file.close()
 
@@ -149,7 +161,7 @@ class VCTK(SpeechDatasetReader):
         add_example(example_test, boys_test)
 
         def dump_to_file(obj, file_path):
-            with open(file_path) as file:
+            with open(file_path, 'w') as file:
                 json.dump(obj, file)
         dump_to_file(example_train, dataset_train)
         dump_to_file(example_dev, dataset_dev)

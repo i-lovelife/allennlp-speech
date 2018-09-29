@@ -1,10 +1,11 @@
 {
-    "python.pythonPath": "${workspaceFolder}/myenv/bin/python",
+    "python.pythonPath": "myenv/bin/python",
     "files.exclude": {
         "**/.pytest_cache/**": true,
         "**/__pycache__/**": true,
         "**/.mypy_cache/**": true,
-        "**/.ipynb_checkpoints/**": true
+        "**/.ipynb_checkpoints/**": true,
+        "**/myenv/**": true
     },
     "files.watcherExclude": {
         "**/.git/objects/**": true,
@@ -13,7 +14,8 @@
         "**/myenv/**": true,
         "**/.mypy_cache/**": true,
         "**/.ipynb_checkpoints/**": true,
-        "${workspaceFolder}/datasets/**":true
+        "${workspaceFolder}/datasets/**":true,
+        "**/allennlp/**":true
     },
     "python.linting.enabled": true,
     "python.linting.pylintEnabled": true,
@@ -28,5 +30,5 @@
     ],
     "python.formatting.provider": "autopep8",
     "python.linting.pylintArgs": ["-d locally-disabled,locally-enabled"],
-    "python.jediEnabled": false,
+    "python.jediEnabled": true,
 }

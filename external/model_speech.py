@@ -1,3 +1,4 @@
+# pylint: skip-file
 import math
 from collections import OrderedDict
 
@@ -194,8 +195,8 @@ class DeepSpeech(nn.Module):
 if __name__ == '__main__':
     feature = torch.FloatTensor(4, 1, 513, 625)#(batch_size,1, feature_dim, T)
     lengths = torch.IntTensor([625, 625, 625, 625])
-    m = DeepSpeech().cuda()
-    out, out_length = m(feature.cuda(), lengths)
+    m = DeepSpeech()
+    out, out_length = m(feature, lengths)
     print(out.size())
     print(out_length)
     

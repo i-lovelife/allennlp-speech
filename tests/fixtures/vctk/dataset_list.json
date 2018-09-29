@@ -1,0 +1,38 @@
+[
+    {
+        "audio_file": "\/home\/lnan6257\/work\/dataset\/speech\/VCTK-Corpus\/wav48\/p345\/p345_046.wav",
+        "meta_data": {
+            "speaker_id": "345",
+            "chapter_id": "046",
+            "sex": 0,
+            "txt": "I haven't enjoyed the last couple of years."
+        }
+    },
+    {
+        "audio_file": "\/home\/lnan6257\/work\/dataset\/speech\/VCTK-Corpus\/wav48\/p345\/p345_349.wav",
+        "meta_data": {
+            "speaker_id": "345",
+            "chapter_id": "349",
+            "sex": 0,
+            "txt": "I saw one body."
+        }
+    },
+    {
+        "audio_file": "\/home\/lnan6257\/work\/dataset\/speech\/VCTK-Corpus\/wav48\/p333\/p333_362.wav",
+        "meta_data": {
+            "speaker_id": "333",
+            "chapter_id": "362",
+            "sex": 1,
+            "txt": "They have two children."
+        }
+    },
+    {
+        "audio_file": "\/home\/lnan6257\/work\/dataset\/speech\/VCTK-Corpus\/wav48\/p333\/p333_382.wav",
+        "meta_data": {
+            "speaker_id": "333",
+            "chapter_id": "382",
+            "sex": 1,
+            "txt": "Partly, but only partly, this is their own fault."
+        }
+    }
+]
