@@ -3,7 +3,7 @@ import numpy as np
 from allennlp.common import Registrable
 
 class AudioTransformer(Registrable):
-    default_implementation = 'mel_spec'
+    default_implementation = 'mag'
     def transform(self, fpath: str) -> np.ndarray:
         """
         Transform an audio sequence into feature.

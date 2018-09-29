@@ -1,5 +1,6 @@
 /datasets/
 /myenv/
+/allennlp/
 __pycache__/
 .pytest_cache/
 # Jupyter Notebook

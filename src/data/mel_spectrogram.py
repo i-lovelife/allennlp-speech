@@ -4,7 +4,7 @@ import numpy as np
 
 from src.data.audio_transformer import AudioTransformer
 
-@AudioTransformer.register('spec')
+@AudioTransformer.register('mag')
 class MelSpectrogram(AudioTransformer):
     def __init__(self,
                  sr: int = 16000,
