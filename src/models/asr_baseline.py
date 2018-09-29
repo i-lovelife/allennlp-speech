@@ -2,6 +2,7 @@ from typing import Optional, Dict, List, Any
 from allennlp.data import Vocabulary
 from allennlp.nn import InitializerApplicator, RegularizerApplicator
 from allennlp.models.model import Model
+from allennlp.nn.util import sort_batch_by_length
 
 from overrides import overrides
 import torch
@@ -42,22 +43,30 @@ class AsrBaseline(Model):
                 **args: Any) -> Dict[str, torch.Tensor]:
         """
         Parameters:
-            features: extracted audio feature (batch, T, feature)
-            label: correspond label (batch, vocab_size)
+            feature: (batch, T, feature)
+            feature_length: (batch)
+            txt_label: {
+                        "character": (batch, max_label_length)
+                    }
+            txt_length: (batch)
         """
-        import pdb;pdb.set_trace()
-        feature = feature.transpose(-2, -1)# (batch, feature, T)
-        feature = feature.unsqueeze(1)# (batch, 1, feature, T)
-        logits, output_lengths = self.speech_model(feature, feature_length)
+        if txt_label is not None:
+            txt_label = txt_label['character'].view(-1)
+        sorted_feature, sorted_feature_length, restore_idx, _ = sort_batch_by_length(feature, feature_length)
+        sorted_feature = sorted_feature.transpose(-2, -1).unsqueeze(1)# (batch, 1, feature, T)
+        logits, output_lengths = self.speech_model(sorted_feature, sorted_feature_length)
+        logits = logits.index_select(0, restore_idx)# (batch, T, num_class)
+        output_lengths = output_lengths.index_select(0, restore_idx)# (batch)
         prob = F.log_softmax(logits, dim=-1)# (batch, T, num_class)
         output_dict = {}
         if txt_label is not None and txt_length is not None:
-            txt_label = txt_label[txt_label['character'].nonzero().squeeze(dim=-1)]# (sum(txt_label))
-            loss = F.ctc_loss(log_probs=prob,
-                              targets=torch.cat(txt_label).int(),
+            import pdb;pdb.set_trace()
+            txt_label = txt_label[txt_label.nonzero().squeeze(dim=-1)]# (sum(txt_label))
+            loss = F.ctc_loss(log_probs=prob.transpose(0, 1),
+                              targets=txt_label.int(),
                               input_lengths=output_lengths.int(),
-                              target_lengths=txt_length.int(),
-                             )
+                              target_lengths=txt_length.int())
+
             output_dict['loss'] = loss
         return output_dict
 

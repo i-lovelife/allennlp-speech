@@ -148,13 +148,10 @@ class DeepSpeech(nn.Module):
         self.inference_softmax = InferenceBatchSoftmax()
 
     def forward(self, x, lengths):
-        lengths = lengths.cpu().int()
         output_lengths = self.get_seq_lens(lengths)
         x, _ = self.conv(x, output_lengths)
 
         sizes = x.size()
-        print(f'sizes = {sizes}')
-        print(f'_= {_}')
         x = x.view(sizes[0], sizes[1] * sizes[2], sizes[3])  # Collapse feature dimension
         x = x.transpose(1, 2).transpose(0, 1).contiguous()  # TxNxH
 
@@ -193,8 +190,8 @@ class DeepSpeech(nn.Module):
 
 
 if __name__ == '__main__':
-    feature = torch.FloatTensor(4, 1, 513, 625)#(batch_size,1, feature_dim, T)
-    lengths = torch.IntTensor([625, 625, 625, 625])
+    feature = torch.rand(4, 1, 513, 256)#(batch_size,1, feature_dim, T)
+    lengths = torch.IntTensor([256, 256, 256, 256])
     m = DeepSpeech()
     out, out_length = m(feature, lengths)
     print(out.size())
